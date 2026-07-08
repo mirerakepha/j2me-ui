@@ -1,5 +1,6 @@
 #include "retro_core.h"
 #include <SDL2/SDL.h>
+#include <assert.h>
 #include <cstdio>
 
 struct KeyMap { SDL_Scancode key; JoypadButton button; };
@@ -79,9 +80,49 @@ int main(int argc, char** argv) {
     SDL_AudioDeviceID audio_dev = SDL_OpenAudioDevice(nullptr, 0, &want, &have, 0);
     if (audio_dev) SDL_PauseAudioDevice(audio_dev, 0);
 
+    const Uint32 frame_delay_ms = static_cast<Uint32>(1000.0 / fps);
+    bool running = true;
 
+    while (running) {
 
+        Uint_32 frame_start = SDL_GetTicks();
 
-    
+        SDL_Event ev;
+        while (SDL_PollEvent(&ev)) {
+            if (ev.type == SDL_Quit) running = false; 
+            if (ev.type == SDL_KEYDOWN || ev.type == SDL_KEYUP) {
+                bool pressed = (ev.type == SDL_KEYDOWN);
+                for (const auto& km : kKeyMap) {
+                    if (ev.key.keysym.scancode == km.key) core.button[km.button] = pressed;
+                }
+            }
+        }
+
+        core run_frame();
+
+        const RetroFrame& f = core.lastFrame();
+        if (f.pixels) {
+            SDL_UpdateTexture(texture, nullptr, f.pixels, static_cast<int>(f.pitch));
+            SDL_RenderClear(renderer);
+            SDL_RenderCopy(renderer, texture, nullptr, nullptr);
+            SDL_RenderPresent(renderer);
+        }
+        if (audio_dev && !g_pending_audio.empty()) {
+            SDL_QueueAudio(audio_dev, g_pending_audio.data(),
+                    static_cast<Uint32>(g_pending_audio.size() * sizeof(int16_t)));
+            g_pending_audio.clear();
+        }
+
+        Uint32 elapsed = SDL_GetTicks() - frame_start;
+        if (elapsed < frame_delay_ms) SDL_Delay(frame_delay_ms - elapsed);
+    }
+
+    if (audio_dev) SDL_CloseAudioDevice(audio_dev);
+    SDL_DestroyTexture(texture);
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+    SDL_Quit();
+
+    return 0;    
 
 }
