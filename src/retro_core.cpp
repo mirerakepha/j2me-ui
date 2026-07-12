@@ -10,14 +10,14 @@ namespace{
     RetroCore* g_active_core = nullptr;
 }
 
-RetroCore::Retrocore() {
+RetroCore::RetroCore() {
     frame_.format = RETRO_PIXEL_FORMAT_RGB565;
 }
 
 RetroCore::~RetroCore() {
-    if (game_loaded && fn_unload_game_) fn_unload_game_();
+    if (game_loaded_ && fn_unload_game_) fn_unload_game_();
     if (handle_) {
-        if (fn_deinit_) fn_deinit();
+        if (fn_deinit_) fn_deinit_();
         dlclose(handle_);
     }
     if (g_active_core == this) g_active_core = nullptr;
@@ -26,19 +26,16 @@ RetroCore::~RetroCore() {
 bool RetroCore::load(const std::string& core_path, const std::string& system_dir) {
     system_dir_ = system_dir;
 
-    handle = dlopen(core_patt.c_str(), RTLD_LAZY | RTLD_LOCAL);
+    handle_ = dlopen(core_path.c_str(), RTLD_LAZY | RTLD_LOCAL);
 
-    if (!handle) {
+    if (!handle_) {
         std::fprintf(stderr, "dlopen failed: %s\n", dlerror());
         return false;
     }
 
     #define RESOLVE(member, symbol) \
         member = reinterpret_cast<decltype(member)>(dlsym(handle_, symbol)); \
-        if (!member) {
-            std::fprintf(stderr, "Missing symbol %s\n", symbol); 
-            return false;
-        }
+        if (!member) { std::fprintf(stderr, "missing symbol: %s\n", symbol); return false; }    
 
     RESOLVE(fn_init_, "retro_init")
     RESOLVE(fn_deinit_, "retro_deinit")
@@ -75,7 +72,7 @@ bool RetroCore::loadGame(const std::string& game_path) {
     info.size = 0;
     info.meta = nullptr;
 
-    if (!load_game_info_(&info)) {
+    if (!fn_load_game_(&info)) {
         std::fprintf(stderr, "retro_game_load failed for %s\n", game_path.c_str());
         return false;
     }
@@ -113,7 +110,7 @@ bool RetroCore::environmentCallback(unsigned cmd, void* data) {
 }
 
 
-void RetroCore::videoRefreshCallback(const void data, unsigned width, unsigned height, size_t patch) {
+void RetroCore::videoRefreshCallback(const void* data, unsigned width, unsigned height, size_t pitch) {
     if (!data) return;
     auto& f = g_active_core->frame_;
     f.pixels = data;
@@ -128,7 +125,7 @@ void RetroCore::audioSampleCallback(int16_t left, int16_t right) {
     g_pending_audio.push_back(right);
 }
 
-size_t RetroCore::audioSampleBatchCallback(int16_t* data, size_t frames) {
+size_t RetroCore::audioSampleBatchCallback(const int16_t* data, size_t frames) {
     size_t old_size = g_pending_audio.size();
     g_pending_audio.resize(old_size + frames * 2);
     std::memcpy(g_pending_audio.data() + old_size, data, frames * 2 * sizeof(int16_t));

@@ -1,0 +1,5 @@
+build/
+*.o
+*.a
+*.out
+compile_commands.json

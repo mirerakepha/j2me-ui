@@ -17,9 +17,9 @@ static const KeyMap kKeyMap[] = {
 
 };
 
-static Uint32 toSdlPixelFormat(retro_pixel_pixel fmt) {
+static Uint32 toSdlPixelFormat(retro_pixel_format fmt) {
     switch (fmt) {
-        case RETRO_PIXEL_FORMAT_XRGB8888: return SDL_PIXELFORMAT_ARGB888;
+        case RETRO_PIXEL_FORMAT_XRGB8888: return SDL_PIXELFORMAT_ARGB8888;
         case RETRO_PIXEL_FORMAT_RGB565: return SDL_PIXELFORMAT_RGB565;
         default: return SDL_PIXELFORMAT_RGB565;
     }
@@ -36,7 +36,7 @@ int main(int argc, char** argv) {
 
     RetroCore core;
 
-    if (!core.load(core_path, system_dir)) return = 1;
+    if (!core.load(core_path, system_dir)) return 1;
     if (!core.loadGame(game_path)) return 1;
 
     const auto& geom = core.avInfo().geometry;
@@ -73,7 +73,7 @@ int main(int argc, char** argv) {
 
     SDL_AudioSpec want{}, have{};
     want.freq = sample_rate;
-    want.format = AUDIO S16SYS;
+    want.format = AUDIO_S16SYS;
     want.channels = 2;
     want.channels = 1024;
 
@@ -85,11 +85,11 @@ int main(int argc, char** argv) {
 
     while (running) {
 
-        Uint_32 frame_start = SDL_GetTicks();
+        Uint32 frame_start = SDL_GetTicks();
 
         SDL_Event ev;
         while (SDL_PollEvent(&ev)) {
-            if (ev.type == SDL_Quit) running = false; 
+            if (ev.type == SDL_QUIT) running = false; 
             if (ev.type == SDL_KEYDOWN || ev.type == SDL_KEYUP) {
                 bool pressed = (ev.type == SDL_KEYDOWN);
                 for (const auto& km : kKeyMap) {
@@ -98,7 +98,7 @@ int main(int argc, char** argv) {
             }
         }
 
-        core run_frame();
+        core.runFrame();
 
         const RetroFrame& f = core.lastFrame();
         if (f.pixels) {

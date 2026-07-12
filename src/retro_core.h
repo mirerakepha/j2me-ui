@@ -23,16 +23,16 @@ struct RetroFrame {
 
 class RetroCore {
     public:
-        RetroCore() == default;
+        RetroCore();
         ~RetroCore();
 
         RetroCore(const RetroCore&) = delete;
         RetroCore& operator=(const RetroCore&) = delete;
 
-        bool load(const std::string& core_path);
+        bool load(const std::string& core_path, const std::string& system_dir);
         bool loadGame(const std::string& game_path);
 
-        void runGame();
+        void runFrame();
 
         const retro_system_av_info& avInfo() const {return av_info_;}
         const RetroFrame& lastFrame() const { return frame_;}
@@ -57,7 +57,7 @@ class RetroCore {
         retro_init_t                 fn_init_ = nullptr;
         retro_deinit_t               fn_deinit_ = nullptr;
         retro_get_system_av_info_t   fn_get_av_info_ = nullptr;
-        retro_run-t                  fn_run_ = nullptr;
+        retro_run_t                  fn_run_ = nullptr;
         retro_load_game_t            fn_load_game_ = nullptr;
         retro_unload_game_t          fn_unload_game_ = nullptr;
         retro_set_environment_t      fn_set_environment_ = nullptr;
