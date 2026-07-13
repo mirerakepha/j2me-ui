@@ -30,4 +30,6 @@ then
 
 - Then enjoy that crap
 
+--- 
+<img width="1920" height="1080" alt="Screenshot From 2026-07-13 09-28-58" src="https://github.com/user-attachments/assets/41f4abf4-05e7-47e5-93e6-dd2778af1646" />
 
