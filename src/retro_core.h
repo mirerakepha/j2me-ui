@@ -10,7 +10,8 @@ enum JoypadButton {
     JOY_B = 0, JOY_Y = 1, JOY_SELECT = 2, JOY_START = 3,
     JOY_UP = 4, JOY_DOWN = 5, JOY_LEFT = 6, JOY_RIGHT = 7,
     JOY_A = 8, JOY_X = 9, JOY_L = 10, JOY_R = 11,
-    JOY_COUNT = 12
+    JOY_L2 = 12, JOY_R2 = 13, JOY_L3 = 14, JOY_R3 = 15,
+    JOY_COUNT = 16
 };
 
 struct RetroFrame {
@@ -29,8 +30,11 @@ class RetroCore {
         RetroCore(const RetroCore&) = delete;
         RetroCore& operator=(const RetroCore&) = delete;
 
-        bool load(const std::string& core_path, const std::string& system_dir);
+        bool load(const std::string& core_path, const std::string& system_dir, const std::string& resolution, const std::string& rotate);
         bool loadGame(const std::string& game_path);
+
+        bool geometryDirty() const { return geometry_dirty_; }
+        void clearGeometryDirty() { geometry_dirty_ = false; }
 
         void runFrame();
 
@@ -50,9 +54,12 @@ class RetroCore {
 
         void* handle_ = nullptr;
         bool game_loaded_ = false;
+        bool geometry_dirty_ = false;
         retro_system_av_info av_info_{};
         RetroFrame frame_;
         std::string system_dir_;
+        std::string resolution_;
+        std::string rotate_;
 
         retro_init_t                 fn_init_ = nullptr;
         retro_deinit_t               fn_deinit_ = nullptr;

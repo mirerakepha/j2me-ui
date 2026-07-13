@@ -6,8 +6,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(SDL2 REQUIRED)
 
-add_compile_options(-Os -fno-exceptions -fno-rtti -fno-unwind-tables -ffunction-sections -fdata-sections)
-add_link_options(-Wl,--gc-sections -s)
+set(CMAKE_CXX_FLAGS_RELEASE "-Os -fno-exceptions -fno-rtti -fno-unwind-tables -ffunction-sections -fdata-sections")
+set(CMAKE_EXE_LINKER_FLAGS_RELEASE "-Wl,--gc-sections -s")
+set(CMAKE_CXX_FLAGS_DEBUG "-g -O0")
+
 
 add_executable(j2me_ui
     src/main.cpp

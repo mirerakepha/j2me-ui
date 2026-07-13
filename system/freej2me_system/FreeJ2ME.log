@@ -1,0 +1,22 @@
+[INFO] Loading MIDlet: GPBikes3D | Main Class: z.GameMIDlet
+[INFO] javax.microedition.midlet.MIDlet: Create MIDlet
+[INFO] javax.microedition.midlet.MIDlet: getAppProperty: MIDlet-Version
+[INFO] javax.microedition.midlet.MIDlet: getAppProperty: pw_cu
+[INFO] javax.microedition.midlet.MIDlet: getAppProperty: zedalias
+[INFO] javax.microedition.midlet.MIDlet: getAppProperty: zedid
+[INFO] javax.microedition.midlet.MIDlet: getAppProperty: pg_url
+[ERROR] org.recompile.mobile.PlatformPlayer: Format is AMR-NB! (not supported yet)
+[ERROR] org.recompile.mobile.PlatformPlayer: Format is AMR-NB! (not supported yet)
+[ERROR] org.recompile.mobile.PlatformPlayer: Format is AMR-NB! (not supported yet)
+[ERROR] org.recompile.mobile.PlatformPlayer: Format is AMR-NB! (not supported yet)
+[ERROR] org.recompile.mobile.PlatformPlayer: Format is AMR-NB! (not supported yet)
+[ERROR] org.recompile.mobile.PlatformPlayer: Format is AMR-NB! (not supported yet)
+[ERROR] org.recompile.mobile.PlatformPlayer: Format is AMR-NB! (not supported yet)
+[ERROR] org.recompile.mobile.PlatformPlayer: Format is AMR-NB! (not supported yet)
+[INFO] javax.microedition.lcdui.Canvas: Create Canvas:320, 240
+[INFO] javax.microedition.lcdui.Canvas: Create Canvas:320, 240
+[INFO] javax.microedition.lcdui.Canvas: Create Canvas:320, 240
+[INFO] javax.microedition.lcdui.Canvas: Create Canvas:320, 240
+[INFO] javax.microedition.lcdui.Canvas: Create Canvas:320, 240
+[INFO] javax.microedition.lcdui.Canvas: Create Canvas:320, 240
+[INFO] javax.microedition.lcdui.Canvas: Create Canvas:320, 240

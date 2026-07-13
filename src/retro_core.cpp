@@ -8,6 +8,7 @@ std::vector<int16_t> g_pending_audio;
 
 namespace{
     RetroCore* g_active_core = nullptr;
+     bool noopRumble(unsigned, retro_rumble_effect, uint16_t) { return true; }
 }
 
 RetroCore::RetroCore() {
@@ -23,8 +24,10 @@ RetroCore::~RetroCore() {
     if (g_active_core == this) g_active_core = nullptr;
 }
 
-bool RetroCore::load(const std::string& core_path, const std::string& system_dir) {
+bool RetroCore::load(const std::string& core_path, const std::string& system_dir, const std::string& resolution, const std::string& rotate) {
     system_dir_ = system_dir;
+    resolution_ = resolution;
+    rotate_ = rotate;
 
     handle_ = dlopen(core_path.c_str(), RTLD_LAZY | RTLD_LOCAL);
 
@@ -93,6 +96,10 @@ bool RetroCore::environmentCallback(unsigned cmd, void* data) {
                                                      *reinterpret_cast<const char**>(data) = g_active_core -> system_dir_.c_str();
                                                      return true;
                                                  }
+    case RETRO_ENVIRONMENT_GET_SAVE_DIRECTORY: {
+                                                   *reinterpret_cast<const char**>(data) = g_active_core->system_dir_.c_str();
+                                                   return true;
+                                               }
 
     case RETRO_ENVIRONMENT_SET_PIXEL_FORMAT: {
                                                  auto fmt = *reinterpret_cast<const retro_pixel_format*>(data);
@@ -100,9 +107,42 @@ bool RetroCore::environmentCallback(unsigned cmd, void* data) {
                                                      g_active_core -> frame_.format = fmt;
                                                      return true;
                                                  }
-
+                                                 return false;
                                              }
+    
+    case RETRO_ENVIRONMENT_GET_VARIABLE: {
+        auto* var = reinterpret_cast<retro_variable*>(data);
+        if (var->key && std::strcmp(var->key, "freej2me_resolution") == 0) {
+            std::fprintf(stderr, "CORE ASKED FOR RESOLUTION, ANSWERING: %s\n", g_active_core->resolution_.c_str());
+            var->value = g_active_core->resolution_.c_str();
+            return true;
+        }
+        if (var->key && std::strcmp(var->key, "freej2me_rotate") == 0) {
+            std::fprintf(stderr, "CORE ASKED FOR ROTATE, ANSWERING: %s\n", g_active_core->rotate_.c_str());
+            var->value = g_active_core->rotate_.c_str();
+            return true;
+        }
         return false;
+    }
+
+    case RETRO_ENVIRONMENT_GET_RUMBLE_INTERFACE: {
+            // We have no real rumble hardware to drive, but the core
+            // calls this pointer completely unconditionally in its main
+            // loop's "no rumble active" branch — leaving it null
+            // segfaults on literally the first frame. A harmless no-op
+            // that just returns true satisfies it safely.
+            auto* iface = reinterpret_cast<retro_rumble_interface*>(data);
+            iface->set_rumble_state = &noopRumble;
+            return true;
+    }
+
+    case RETRO_ENVIRONMENT_SET_GEOMETRY: {
+            auto* geom = reinterpret_cast<const retro_game_geometry*>(data);
+            g_active_core->av_info_.geometry = *geom;
+            g_active_core->geometry_dirty_ = true;
+            return true;
+    }
+    
     default:
         return false;
     

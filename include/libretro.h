@@ -11,10 +11,31 @@ extern "C" {
 #endif
 
 #define RETRO_ENVIRONMENT_GET_SYSTEM_DIRECTORY 9
+#define RETRO_ENVIRONMENT_GET_SAVE_DIRECTORY 31
+#define RETRO_ENVIRONMENT_SET_GEOMETRY 37
 #define RETRO_ENVIRONMENT_SET_PIXEL_FORMAT     10
 #define RETRO_ENVIRONMENT_GET_LOG_INTERFACE    27
-
+#define RETRO_ENVIRONMENT_GET_VARIABLE         15
 #define RETRO_DEVICE_JOYPAD 1
+#define RETRO_ENVIRONMENT_GET_RUMBLE_INTERFACE 23
+
+enum retro_rumble_effect
+{
+   RETRO_RUMBLE_STRONG = 0,
+   RETRO_RUMBLE_WEAK = 1
+};
+
+typedef bool (*retro_set_rumble_state_t)(unsigned port, enum retro_rumble_effect effect, uint16_t strength);
+
+struct retro_rumble_interface
+{
+   retro_set_rumble_state_t set_rumble_state;
+};
+
+struct retro_variable {
+    const char *key;
+    const char *value;
+};
 
 enum retro_pixel_format
 {

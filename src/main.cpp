@@ -10,7 +10,7 @@ static const KeyMap kKeyMap[] = {
     { SDL_SCANCODE_DOWN, JOY_DOWN },
     { SDL_SCANCODE_LEFT, JOY_LEFT },
     { SDL_SCANCODE_RIGHT, JOY_RIGHT },
-    { SDL_SCANCODE_RETURN, JOY_A }, // FIRE center key
+    { SDL_SCANCODE_RETURN, JOY_L3 }, // FIRE center key
     { SDL_SCANCODE_Q, JOY_L },
     { SDL_SCANCODE_W, JOY_R },
     { SDL_SCANCODE_ESCAPE, JOY_START },
@@ -33,10 +33,11 @@ int main(int argc, char** argv) {
     const std::string core_path = argv[1];
     const std::string system_dir = argv[2];
     const std::string game_path = argv[3];
-
+    const std::string resolution = argc >= 5 ? argv[4] : "800x800";
+    const std::string rotate = argc >= 6 ? argv[5] : "0";
     RetroCore core;
 
-    if (!core.load(core_path, system_dir)) return 1;
+    if (!core.load(core_path, system_dir, resolution, rotate)) return 1;
     if (!core.loadGame(game_path)) return 1;
 
     const auto& geom = core.avInfo().geometry;
@@ -54,8 +55,9 @@ int main(int argc, char** argv) {
             "J2ME UI",
             SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
             geom.base_width * scale, geom.base_height * scale,
-            SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE
+            SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE 
             );
+
     if (!window) {
         std::fprintf(stderr, "SDL_CreateWindow failed: %s\n", SDL_GetError());
         return 1;
@@ -63,6 +65,7 @@ int main(int argc, char** argv) {
 
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     SDL_RenderSetLogicalSize(renderer, geom.base_width, geom.base_height);
+    SDL_RenderSetIntegerScale(renderer, SDL_FALSE);
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
 
     SDL_Texture* texture = SDL_CreateTexture(
@@ -75,7 +78,7 @@ int main(int argc, char** argv) {
     want.freq = sample_rate;
     want.format = AUDIO_S16SYS;
     want.channels = 2;
-    want.channels = 1024;
+    want.samples = 1024;
 
     SDL_AudioDeviceID audio_dev = SDL_OpenAudioDevice(nullptr, 0, &want, &have, 0);
     if (audio_dev) SDL_PauseAudioDevice(audio_dev, 0);
@@ -100,11 +103,28 @@ int main(int argc, char** argv) {
 
         core.runFrame();
 
+        if (core.geometryDirty()) {
+            const auto& newGeom = core.avInfo().geometry;
+            std::fprintf(stderr, "GEOMETRY CHANGED: base=%ux%u max=%ux%u aspect=%f\n",
+                         newGeom.base_width, newGeom.base_height,
+                         newGeom.max_width, newGeom.max_height, newGeom.aspect_ratio);
+            SDL_RenderSetLogicalSize(renderer, newGeom.base_width, newGeom.base_height);
+            SDL_SetWindowSize(window, newGeom.base_width * scale, newGeom.base_height * scale);
+            SDL_DestroyTexture(texture);
+            texture = SDL_CreateTexture(
+                renderer, toSdlPixelFormat(core.lastFrame().format),
+                SDL_TEXTUREACCESS_STREAMING,
+                newGeom.max_width ? newGeom.max_width : newGeom.base_width,
+                newGeom.max_height ? newGeom.max_height : newGeom.base_height);
+            core.clearGeometryDirty();
+        }
+
         const RetroFrame& f = core.lastFrame();
         if (f.pixels) {
-            SDL_UpdateTexture(texture, nullptr, f.pixels, static_cast<int>(f.pitch));
+            SDL_Rect r{0, 0, static_cast<int>(f.width), static_cast<int>(f.height)};
+            SDL_UpdateTexture(texture, &r, f.pixels, static_cast<int>(f.pitch));
             SDL_RenderClear(renderer);
-            SDL_RenderCopy(renderer, texture, nullptr, nullptr);
+            SDL_RenderCopy(renderer, texture, &r, nullptr);
             SDL_RenderPresent(renderer);
         }
         if (audio_dev && !g_pending_audio.empty()) {
