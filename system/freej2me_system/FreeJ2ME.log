@@ -1,22 +1,5 @@
-[INFO] Loading MIDlet: GPBikes3D | Main Class: z.GameMIDlet
+[INFO] Loading MIDlet: mobapp-game | Main Class: mobileapplication3.GameMIDlet
 [INFO] javax.microedition.midlet.MIDlet: Create MIDlet
-[INFO] javax.microedition.midlet.MIDlet: getAppProperty: MIDlet-Version
-[INFO] javax.microedition.midlet.MIDlet: getAppProperty: pw_cu
-[INFO] javax.microedition.midlet.MIDlet: getAppProperty: zedalias
-[INFO] javax.microedition.midlet.MIDlet: getAppProperty: zedid
-[INFO] javax.microedition.midlet.MIDlet: getAppProperty: pg_url
-[ERROR] org.recompile.mobile.PlatformPlayer: Format is AMR-NB! (not supported yet)
-[ERROR] org.recompile.mobile.PlatformPlayer: Format is AMR-NB! (not supported yet)
-[ERROR] org.recompile.mobile.PlatformPlayer: Format is AMR-NB! (not supported yet)
-[ERROR] org.recompile.mobile.PlatformPlayer: Format is AMR-NB! (not supported yet)
-[ERROR] org.recompile.mobile.PlatformPlayer: Format is AMR-NB! (not supported yet)
-[ERROR] org.recompile.mobile.PlatformPlayer: Format is AMR-NB! (not supported yet)
-[ERROR] org.recompile.mobile.PlatformPlayer: Format is AMR-NB! (not supported yet)
-[ERROR] org.recompile.mobile.PlatformPlayer: Format is AMR-NB! (not supported yet)
-[INFO] javax.microedition.lcdui.Canvas: Create Canvas:320, 240
-[INFO] javax.microedition.lcdui.Canvas: Create Canvas:320, 240
-[INFO] javax.microedition.lcdui.Canvas: Create Canvas:320, 240
-[INFO] javax.microedition.lcdui.Canvas: Create Canvas:320, 240
-[INFO] javax.microedition.lcdui.Canvas: Create Canvas:320, 240
-[INFO] javax.microedition.lcdui.Canvas: Create Canvas:320, 240
-[INFO] javax.microedition.lcdui.Canvas: Create Canvas:320, 240
+[INFO] javax.microedition.lcdui.Canvas: Create Canvas:176, 220 suppressKeys:false
+[ERROR] org.recompile.mobile.MIDletLoader: Couldn't find resource 's65.mgstruct' in jar: file:/home/strange/CppProjects/j2me-ui/system/mobapp-game-j2me-v0.9.7.jar
+[ERROR] org.recompile.mobile.MIDletLoader: Couldn't find resource 's65.mgstruct' in jar: file:/home/strange/CppProjects/j2me-ui/system/mobapp-game-j2me-v0.9.7.jar
